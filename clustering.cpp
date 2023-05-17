@@ -123,7 +123,7 @@ Points Dendrogram::getPoints() const
 
 Clusters Dendrogram::getClusters(int level) const
 {
-  if (level == -1)
+  if (level == -1 || level >= levels.size())
     return clusters;
   else
     return levels[level];

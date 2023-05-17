@@ -34,6 +34,7 @@
 using namespace math;
 
 bool g_showClusters = true;
+bool g_colorizeByCluster = false;
 float g_cutLevel = 0.f;
 float g_maxCutLevel = 0.f;
 
@@ -51,6 +52,16 @@ static QColor mapColor(float val01)
   float frac = val01*numCols-floorf(val01*numCols);
   vec3f col = lerp(cols[col1],cols[col2],frac);
   return QColor::fromRgbF(col.x,col.y,col.z);
+}
+
+inline QColor randomColor(size_t idx)
+{
+  unsigned int r = (unsigned int)(idx*13*17 + 0x234235);
+  unsigned int g = (unsigned int)(idx*7*3*5 + 0x773477);
+  unsigned int b = (unsigned int)(idx*11*19 + 0x223766);
+  return QColor::fromRgbF((r&255)/255.f,
+                          (g&255)/255.f,
+                          (b&255)/255.f);
 }
 
 std::vector<vec2f> randomPoints(size_t n)
@@ -183,8 +194,22 @@ public:
       painter.setPen(pen);
 
       QBrush cbrush;
-      //cbrush.setColor(c.color);
-      cbrush.setColor(mapColor(i/float(points.size()-1)));
+      if (g_colorizeByCluster) {
+        const Clusters &clusters = dendro->getClusters(g_cutLevel);
+        for (size_t clusterID=0;clusterID<clusters.size();++clusterID) {
+          bool found=false;
+          for (size_t j=0; j<clusters[clusterID].pointIDs.size(); ++j) {
+            if (clusters[clusterID].pointIDs[j] == i) {
+              cbrush.setColor(randomColor(clusterID));
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+      }
+      else
+        cbrush.setColor(mapColor(i/float(points.size()-1)));
       cbrush.setStyle(Qt::SolidPattern);
       painter.setBrush(cbrush);
 
@@ -232,6 +257,9 @@ class DendroWidget : public QWidget
 {
 public:
   Q_OBJECT
+
+signals:
+  void cutUpdated();
 
 public:
   DendroWidget(QWidget *parent) : QWidget(parent)
@@ -284,7 +312,7 @@ public:
       float cutY = computeYCoord(g_cutLevel)*height();
       if (pos.x() > canvasWidth() && pos.y() > cutY-6 && pos.y() < cutY+6) {
         sliderDragging = true;
-        repaint();
+        emit cutUpdated();
       }
     }
   }
@@ -293,7 +321,7 @@ public:
   {
     if (sliderDragging) {
       sliderDragging = false;
-      repaint();
+      emit cutUpdated();
     }
   }
 
@@ -302,7 +330,7 @@ public:
     if (sliderDragging) {
       float y = event->pos().y();
       g_cutLevel = std::max(0.f,std::min(computeLevel(y/height()),g_maxCutLevel));
-      repaint();
+      emit cutUpdated();
     }
   }
 
@@ -378,8 +406,22 @@ public:
       painter.setPen(pen);
 
       QBrush cbrush;
-      //cbrush.setColor(c.color);
-      cbrush.setColor(mapColor(i/float(points.size()-1)));
+      if (g_colorizeByCluster) {
+        const Clusters &clusters = dendro->getClusters(g_cutLevel);
+        for (size_t clusterID=0;clusterID<clusters.size();++clusterID) {
+          bool found=false;
+          for (size_t j=0; j<clusters[clusterID].pointIDs.size(); ++j) {
+            if (clusters[clusterID].pointIDs[j] == i) {
+              cbrush.setColor(randomColor(clusterID));
+              found = true;
+              break;
+            }
+          }
+          if (found) break;
+        }
+      }
+      else
+        cbrush.setColor(mapColor(i/float(points.size()-1)));
       cbrush.setStyle(Qt::SolidPattern);
       painter.setBrush(cbrush);
 
@@ -464,6 +506,12 @@ int main(int argc, char **argv)
   DendroWidget *dendroWidget = new DendroWidget(&win);
   dendroWidget->setDendrogram(dendro);
 
+  QObject::connect(dendroWidget, &DendroWidget::cutUpdated,
+    [&]() {
+      clusterWidget->repaint();
+      dendroWidget->repaint();
+    });
+
   QHBoxLayout *hlayout = new QHBoxLayout;
   hlayout->addWidget(clusterWidget);
   hlayout->addWidget(dendroWidget);
@@ -528,6 +576,18 @@ int main(int argc, char **argv)
       dendroWidget->repaint();
     });
   buttonLayout->addWidget(showClustersBox);
+
+  QCheckBox *colorizeBox = new QCheckBox(&win);
+  colorizeBox->setText("Color from Cluster");
+  colorizeBox->setMaximumWidth(160);
+  colorizeBox->setCheckState(g_colorizeByCluster? Qt::Checked: Qt::Unchecked);
+  QObject::connect(colorizeBox, &QCheckBox::clicked,
+    [&](bool value) {
+      g_colorizeByCluster = value;
+      clusterWidget->repaint();
+      dendroWidget->repaint();
+    });
+  buttonLayout->addWidget(colorizeBox);
 
   QPushButton *computeButton = new QPushButton(&win);
   computeButton->setText("Compute Dendrogram");
