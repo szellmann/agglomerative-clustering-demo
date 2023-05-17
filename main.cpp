@@ -314,22 +314,32 @@ public:
   bool sliderDragging=false;
   void mousePressEvent(QMouseEvent *event)
   {
+    QPoint pos = event->pos();
+    if (pos.x() <= canvasWidth())
+      return;
+
     if (!sliderDragging) {
-      QPoint pos = event->pos();
       float cutY = computeYCoord(g_cutLevel)*height();
-      if (pos.x() > canvasWidth() && pos.y() > cutY-6 && pos.y() < cutY+6) {
-        sliderDragging = true;
-        emit cutUpdated();
-      }
+      sliderDragging = true;
+      float y = pos.y();
+      g_cutLevel = std::max(0.f,std::min(computeLevel(y/height()),g_maxCutLevel));
+      emit cutUpdated();
     }
   }
 
   void mouseReleaseEvent(QMouseEvent *event)
   {
-    if (sliderDragging) {
+    QPoint pos = event->pos();
+    if (pos.x() <= canvasWidth()) {
       sliderDragging = false;
       emit cutUpdated();
+      return;
     }
+
+    float y = pos.y();
+    g_cutLevel = std::max(0.f,std::min(computeLevel(y/height()),g_maxCutLevel));
+    sliderDragging = false;
+    emit cutUpdated();
   }
 
   void mouseMoveEvent(QMouseEvent *event)
