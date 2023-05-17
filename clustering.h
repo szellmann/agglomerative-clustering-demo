@@ -23,6 +23,7 @@ enum class SimilarityMetric
 {
   ManhattanDistance,
   EuclideanDistance,
+  ChebyshevDistance,
   SurfaceArea,
 };
 

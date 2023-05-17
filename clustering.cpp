@@ -72,6 +72,11 @@ bool Dendrogram::step()
                + fabsf(clusters[i].bounds.center().y-clusters[j].bounds.center().y);
         } else if (metric == SimilarityMetric::EuclideanDistance) {
           dist = length(clusters[i].bounds.center()-clusters[j].bounds.center());
+        } else if (metric == SimilarityMetric::ChebyshevDistance) {
+          dist = std::max(
+            fabsf(clusters[i].bounds.center().x-clusters[j].bounds.center().x),
+            fabsf(clusters[i].bounds.center().y-clusters[j].bounds.center().y)
+          );
         } else if (metric == SimilarityMetric::SurfaceArea) {
           box2f b = clusters[i].bounds;
           b.extend(clusters[j].bounds);

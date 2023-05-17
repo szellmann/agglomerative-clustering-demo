@@ -580,13 +580,16 @@ int main(int argc, char **argv)
   QComboBox *metricBox = new QComboBox(&win);
   metricBox->addItem("Manhattan Distance");
   metricBox->addItem("Euclidean Distance");
+  metricBox->addItem("Chebyshev Distance");
   metricBox->addItem("Surface Area (2D)");
   if (dendro.metric == SimilarityMetric::ManhattanDistance)
     metricBox->setCurrentIndex(0);
   else if (dendro.metric == SimilarityMetric::EuclideanDistance)
     metricBox->setCurrentIndex(1);
-  else if (dendro.metric == SimilarityMetric::SurfaceArea)
+  else if (dendro.metric == SimilarityMetric::ChebyshevDistance)
     metricBox->setCurrentIndex(2);
+  else if (dendro.metric == SimilarityMetric::SurfaceArea)
+    metricBox->setCurrentIndex(3);
   QObject::connect(metricBox, &QComboBox::currentIndexChanged,
     [&](int index) {
       reset();
@@ -595,6 +598,8 @@ int main(int argc, char **argv)
       else if (index == 1)
         dendro.metric = SimilarityMetric::EuclideanDistance;
       else if (index == 2)
+        dendro.metric = SimilarityMetric::ChebyshevDistance;
+      else if (index == 3)
         dendro.metric = SimilarityMetric::SurfaceArea;
       clusterWidget->repaint();
       dendroWidget->repaint();
