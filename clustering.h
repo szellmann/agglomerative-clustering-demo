@@ -19,6 +19,13 @@
 #include <vector>
 #include "math.h"
 
+enum class SimilarityMetric
+{
+  ManhattanDistance,
+  EuclideanDistance,
+  SurfaceArea,
+};
+
 struct AggCluster
 {
   std::vector<size_t> pointIDs;
@@ -51,6 +58,7 @@ public:
 
   int currentLevel = 0;
 
+  SimilarityMetric metric = SimilarityMetric::EuclideanDistance;
 private:
   std::vector<math::vec2f> input;
   Clusters clusters;

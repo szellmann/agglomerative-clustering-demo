@@ -277,6 +277,11 @@ struct box2f
   }
 
   inline
+  vec2f size() const {
+    return upper-lower;
+  }
+
+  inline
   bool contains(vec2f p) const {
     return lower.x<=p.x && p.x<=upper.x
         && lower.y<=p.y && p.y<=upper.y;
@@ -286,6 +291,12 @@ struct box2f
   void extend(vec2f v) {
     lower = min(lower,v);
     upper = max(upper,v);
+  }
+
+  inline
+  void extend(box2f other) {
+    extend(other.lower);
+    extend(other.upper);
   }
 
   vec2f lower, upper;

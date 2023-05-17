@@ -66,7 +66,17 @@ bool Dendrogram::step()
     float bestSimilarity = FLT_MAX;
     for (size_t i=0; i<clusters.size(); ++i) {
       for (size_t j=i+1; j<clusters.size(); ++j) {
-        float dist = length(clusters[i].bounds.center()-clusters[j].bounds.center());
+        float dist = FLT_MAX;
+        if (metric == SimilarityMetric::ManhattanDistance) {
+          dist = fabsf(clusters[i].bounds.center().x-clusters[j].bounds.center().x)
+               + fabsf(clusters[i].bounds.center().y-clusters[j].bounds.center().y);
+        } else if (metric == SimilarityMetric::EuclideanDistance) {
+          dist = length(clusters[i].bounds.center()-clusters[j].bounds.center());
+        } else if (metric == SimilarityMetric::SurfaceArea) {
+          box2f b = clusters[i].bounds;
+          b.extend(clusters[j].bounds);
+          dist = b.size().x+b.size().y;
+        }
         if (dist < bestSimilarity) {
           id1 = i;
           id2 = j;

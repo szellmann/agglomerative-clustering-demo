@@ -25,14 +25,17 @@
 #include <QScrollArea>
 #include <QPainter>
 #include <QPainterPath>
+#include <QLabel>
 #include <QPushButton>
 #include <QCheckBox>
+#include <QComboBox>
 #include <QMouseEvent>
 #include "clustering.h"
 #include "math.h"
 
 using namespace math;
 
+int g_initialDist = 2;
 bool g_showClusters = true;
 bool g_colorizeByCluster = false;
 float g_cutLevel = 0.f;
@@ -481,7 +484,7 @@ int main(int argc, char **argv)
 
   QMainWindow win;
   win.setWindowTitle("Agglomerative Clustering Interactive Demo");
-  win.resize(1024,768);
+  win.resize(1280,800);
 
   // sort the points so the dendrogram has fewer crossings
   // (merely for aesthetic reasons)
@@ -492,12 +495,23 @@ int main(int argc, char **argv)
     return out;
   };
 
-  //std::vector<vec2f> pts = doSort(randomPoints(100));
-  //std::vector<vec2f> pts = doSort(smiley(150));
-  std::vector<vec2f> pts = doSort(preset1());
-
   Dendrogram dendro;
-  dendro.reset(pts);
+
+  std::vector<vec2f> pts;
+
+  auto reset = [&]() {
+    if (g_initialDist == 0)
+      pts = doSort(randomPoints(100));
+    else if (g_initialDist == 1)
+      pts = doSort(smiley(150));
+    else if (g_initialDist == 2)
+      pts = doSort(preset1());
+    dendro.reset(pts);
+    g_cutLevel = 0.f;
+    g_maxCutLevel = 0.f;
+  };
+
+  reset();
 
   // cluster and dendroid widgets
   ClusterWidget *clusterWidget = new ClusterWidget(&win);
@@ -528,10 +542,8 @@ int main(int argc, char **argv)
   resetRandomButton->setMaximumWidth(160);
   QObject::connect(resetRandomButton, &QPushButton::pressed,
     [&]() {
-      pts = doSort(randomPoints(100));
-      dendro.reset(pts);
-      g_cutLevel = 0.f;
-      g_maxCutLevel = 0.f;
+      g_initialDist = 0;
+      reset();
       clusterWidget->repaint();
       dendroWidget->repaint();
     });
@@ -542,10 +554,8 @@ int main(int argc, char **argv)
   resetSmileyButton->setMaximumWidth(160);
   QObject::connect(resetSmileyButton, &QPushButton::pressed,
     [&]() {
-      pts = doSort(smiley(150));
-      dendro.reset(pts);
-      g_cutLevel = 0.f;
-      g_maxCutLevel = 0.f;
+      g_initialDist = 1;
+      reset();
       clusterWidget->repaint();
       dendroWidget->repaint();
     });
@@ -556,14 +566,42 @@ int main(int argc, char **argv)
   resetPreset1Button->setMaximumWidth(160);
   QObject::connect(resetPreset1Button, &QPushButton::pressed,
     [&]() {
-      pts = doSort(preset1());
-      dendro.reset(pts);
-      g_cutLevel = 0.f;
-      g_maxCutLevel = 0.f;
+      g_initialDist = 2;
+      reset();
       clusterWidget->repaint();
       dendroWidget->repaint();
     });
   buttonLayout->addWidget(resetPreset1Button);
+
+  QHBoxLayout *metricLayout = new QHBoxLayout;
+  QLabel *metricLabel = new QLabel(&win);
+  metricLabel->setText("Similarity Metric:");
+  metricLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+  QComboBox *metricBox = new QComboBox(&win);
+  metricBox->addItem("Manhattan Distance");
+  metricBox->addItem("Euclidean Distance");
+  metricBox->addItem("Surface Area (2D)");
+  if (dendro.metric == SimilarityMetric::ManhattanDistance)
+    metricBox->setCurrentIndex(0);
+  else if (dendro.metric == SimilarityMetric::EuclideanDistance)
+    metricBox->setCurrentIndex(1);
+  else if (dendro.metric == SimilarityMetric::SurfaceArea)
+    metricBox->setCurrentIndex(2);
+  QObject::connect(metricBox, &QComboBox::currentIndexChanged,
+    [&](int index) {
+      reset();
+      if (index == 0)
+        dendro.metric = SimilarityMetric::ManhattanDistance;
+      else if (index == 1)
+        dendro.metric = SimilarityMetric::EuclideanDistance;
+      else if (index == 2)
+        dendro.metric = SimilarityMetric::SurfaceArea;
+      clusterWidget->repaint();
+      dendroWidget->repaint();
+    });
+  metricLayout->addWidget(metricLabel);
+  metricLayout->addWidget(metricBox);
+  buttonLayout->addLayout(metricLayout);
 
   QCheckBox *showClustersBox = new QCheckBox(&win);
   showClustersBox->setText("Show Clusters");
@@ -578,7 +616,7 @@ int main(int argc, char **argv)
   buttonLayout->addWidget(showClustersBox);
 
   QCheckBox *colorizeBox = new QCheckBox(&win);
-  colorizeBox->setText("Color from Cluster");
+  colorizeBox->setText("Color by Cluster ID");
   colorizeBox->setMaximumWidth(160);
   colorizeBox->setCheckState(g_colorizeByCluster? Qt::Checked: Qt::Unchecked);
   QObject::connect(colorizeBox, &QCheckBox::clicked,
