@@ -249,7 +249,11 @@ public:
     QPen pen;
     pen.setColor(Qt::white);
     painter.setPen(pen);
+#ifdef __APPLE__
     painter.drawText(QPointF(0.f,22.f),"2D points");
+#else
+    painter.drawText(QPointF(0.f,28.f),"2D points");
+#endif
   }
 
 private:
@@ -471,7 +475,11 @@ public:
 
     pen.setColor(Qt::black);
     painter.setPen(pen);
+#ifdef __APPLE__
     painter.drawText(QPointF(0.f,22.f),"Dendrogram");
+#else
+    painter.drawText(QPointF(0.f,28.f),"Dendrogram");
+#endif
   }
 
 private:
@@ -590,7 +598,7 @@ int main(int argc, char **argv)
     metricBox->setCurrentIndex(2);
   else if (dendro.metric == SimilarityMetric::SurfaceArea)
     metricBox->setCurrentIndex(3);
-  QObject::connect(metricBox, &QComboBox::currentIndexChanged,
+  QObject::connect(metricBox, qOverload<int>(&QComboBox::currentIndexChanged),
     [&](int index) {
       reset();
       if (index == 0)
