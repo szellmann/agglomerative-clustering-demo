@@ -218,7 +218,7 @@ public:
     }
 
     if (g_showClusters) {
-      const Clusters &clusters = dendro->getClusters();
+      const Clusters &clusters = dendro->getClusters(g_cutLevel);
       for (size_t i=0; i<clusters.size(); ++i) {
         QPen pen;
         pen.setColor(Qt::black);
@@ -391,7 +391,7 @@ public:
 
       QPen pen;
       pen.setColor(Qt::black);
-      if (l==dendro->currentLevel) {
+      if (g_showClusters && l==int(g_cutLevel)) {
         pen.setWidth(3);
       }
       painter.setPen(pen);
