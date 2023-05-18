@@ -47,6 +47,48 @@ void Dendrogram::reset(const std::vector<vec2f> &points)
   }
 }
 
+inline
+float manhattanDistance(const vec2f a, const vec2f b)
+{
+  return fabsf(a.x-b.x) + fabsf(a.y-b.y);
+}
+
+inline
+float euclideanDistance(const vec2f a, const vec2f b)
+{
+  return length(a-b);
+}
+
+inline
+float chebyshevDistance(const vec2f a, const vec2f b)
+{
+  return fmaxf(fabsf(a.x-b.x),fabsf(a.y-b.y));
+}
+
+inline
+float surfaceArea(const vec2f a, const vec2f b)
+{
+  box2f box{FLT_MAX,-FLT_MAX};
+  box.extend(a);
+  box.extend(b);
+  return box.size().x * box.size().y;
+}
+
+inline
+float similarityFunction(SimilarityMetric metric, const vec2f a, const vec2f b)
+{
+  if (metric == SimilarityMetric::ManhattanDistance)
+    return manhattanDistance(a,b);
+  else if (metric == SimilarityMetric::EuclideanDistance)
+    return euclideanDistance(a,b);
+  else if (metric == SimilarityMetric::ChebyshevDistance)
+    return chebyshevDistance(a,b);
+  else if (metric == SimilarityMetric::SurfaceArea)
+    return surfaceArea(a,b);
+  else
+    return FLT_MAX;
+}
+
 bool Dendrogram::step()
 {
   if (clusters.size() == 1)
@@ -60,28 +102,16 @@ bool Dendrogram::step()
 
     // find the two most similar clusters
     // this is the costly part of this algorithm!
-    // in the next lecture we will learn how to optimize
-    // this for better/real-time performance
+    // How to optimize this for interactive builds
+    // is a topic for a master's class
     size_t id1, id2;
     float bestSimilarity = FLT_MAX;
     for (size_t i=0; i<clusters.size(); ++i) {
       for (size_t j=i+1; j<clusters.size(); ++j) {
-        float dist = FLT_MAX;
-        if (metric == SimilarityMetric::ManhattanDistance) {
-          dist = fabsf(clusters[i].bounds.center().x-clusters[j].bounds.center().x)
-               + fabsf(clusters[i].bounds.center().y-clusters[j].bounds.center().y);
-        } else if (metric == SimilarityMetric::EuclideanDistance) {
-          dist = length(clusters[i].bounds.center()-clusters[j].bounds.center());
-        } else if (metric == SimilarityMetric::ChebyshevDistance) {
-          dist = std::max(
-            fabsf(clusters[i].bounds.center().x-clusters[j].bounds.center().x),
-            fabsf(clusters[i].bounds.center().y-clusters[j].bounds.center().y)
-          );
-        } else if (metric == SimilarityMetric::SurfaceArea) {
-          box2f b = clusters[i].bounds;
-          b.extend(clusters[j].bounds);
-          dist = b.size().x+b.size().y;
-        }
+        float dist = similarityFunction(metric,
+                                        clusters[i].bounds.center(),
+                                        clusters[j].bounds.center());
+
         if (dist < bestSimilarity) {
           id1 = i;
           id2 = j;
