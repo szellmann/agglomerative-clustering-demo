@@ -29,6 +29,7 @@
 #include <QPushButton>
 #include <QCheckBox>
 #include <QComboBox>
+#include <QGroupBox>
 #include <QMouseEvent>
 #include "clustering.h"
 #include "math.h"
@@ -591,6 +592,46 @@ int main(int argc, char **argv)
     });
   buttonLayout->addWidget(resetPreset1Button);
 
+  QGroupBox *comboGroupBox = new QGroupBox(&win);
+  QVBoxLayout *comboLayout = new QVBoxLayout;
+  comboGroupBox->setLayout(comboLayout);
+  buttonLayout->addWidget(comboGroupBox);
+
+  QHBoxLayout *linkageLayout = new QHBoxLayout;
+  QLabel *linkageLabel = new QLabel(&win);
+  linkageLabel->setText("Linkage:");
+  linkageLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+  QComboBox *linkageBox = new QComboBox(&win);
+  linkageBox->addItem("Single");
+  linkageBox->addItem("Complete");
+  linkageBox->addItem("Centroid");
+  linkageBox->addItem("Average");
+  if (dendro.linkage == Linkage::Single)
+    linkageBox->setCurrentIndex(0);
+  else if (dendro.linkage == Linkage::Complete)
+    linkageBox->setCurrentIndex(1);
+  else if (dendro.linkage == Linkage::Centroid)
+    linkageBox->setCurrentIndex(2);
+  else if (dendro.linkage == Linkage::Average)
+    linkageBox->setCurrentIndex(3);
+  QObject::connect(linkageBox, qOverload<int>(&QComboBox::currentIndexChanged),
+    [&](int index) {
+      reset();
+      if (index == 0)
+        dendro.linkage = Linkage::Single;
+      else if (index == 1)
+        dendro.linkage = Linkage::Complete;
+      else if (index == 2)
+        dendro.linkage = Linkage::Centroid;
+      else if (index == 3)
+        dendro.linkage = Linkage::Average;
+      clusterWidget->repaint();
+      dendroWidget->repaint();
+    });
+  linkageLayout->addWidget(linkageLabel);
+  linkageLayout->addWidget(linkageBox);
+  comboLayout->addLayout(linkageLayout);
+
   QHBoxLayout *metricLayout = new QHBoxLayout;
   QLabel *metricLabel = new QLabel(&win);
   metricLabel->setText("Similarity Metric:");
@@ -624,7 +665,7 @@ int main(int argc, char **argv)
     });
   metricLayout->addWidget(metricLabel);
   metricLayout->addWidget(metricBox);
-  buttonLayout->addLayout(metricLayout);
+  comboLayout->addLayout(metricLayout);
 
   QCheckBox *showClustersBox = new QCheckBox(&win);
   showClustersBox->setText("Show Clusters");
