@@ -52,6 +52,30 @@ vec2f operator/(vec2f u, vec2f v) {
 }
 
 inline
+vec2f& operator+=(vec2f &u, vec2f v) {
+  u=u+v;
+  return u;
+}
+
+inline
+vec2f& operator-=(vec2f &u, vec2f v) {
+  u=u-v;
+  return u;
+}
+
+inline
+vec2f& operator*=(vec2f &u, vec2f v) {
+  u=u*v;
+  return u;
+}
+
+inline
+vec2f& operator/=(vec2f &u, vec2f v) {
+  u=u/v;
+  return u;
+}
+
+inline
 vec2f min(vec2f u, vec2f v) {
   return {fminf(u.x,v.x),fminf(u.y,v.y)};
 }

@@ -108,15 +108,93 @@ bool Dendrogram::step()
     float bestSimilarity = FLT_MAX;
     for (size_t i=0; i<clusters.size(); ++i) {
       for (size_t j=i+1; j<clusters.size(); ++j) {
-        float dist = similarityFunction(metric,
-                                        clusters[i].bounds.center(),
-                                        clusters[j].bounds.center());
 
-        if (dist < bestSimilarity) {
-          id1 = i;
-          id2 = j;
-          bestSimilarity = dist;
+        // Single linkage; the similarity between clusters
+        // is determined by the two closest points
+        // Requires pairwise comparison of all points in cluster!
+        if (linkage == Linkage::Single) {
+          float closestDist = FLT_MAX;
+          for (size_t ii=0; ii<clusters[i].pointIDs.size(); ++ii) {
+            for (size_t jj=0; jj<clusters[j].pointIDs.size(); ++jj) {
+              float dist = similarityFunction(metric,
+                                              input[clusters[i].pointIDs[ii]],
+                                              input[clusters[j].pointIDs[jj]]);
+              
+              if (dist < closestDist) {
+                closestDist = dist;
+              }
+            }
+          }
+
+          if (closestDist < bestSimilarity) {
+            id1 = i;
+            id2 = j;
+            bestSimilarity = closestDist;
+          }
         }
+
+        // Single linkage; the similarity between clusters
+        // is determined by the two farthest points
+        // Requires pairwise comparison of all points in cluster!
+        if (linkage == Linkage::Complete) {
+          float farthestDist = -FLT_MAX;
+          for (size_t ii=0; ii<clusters[i].pointIDs.size(); ++ii) {
+            for (size_t jj=0; jj<clusters[j].pointIDs.size(); ++jj) {
+              float dist = similarityFunction(metric,
+                                              input[clusters[i].pointIDs[ii]],
+                                              input[clusters[j].pointIDs[jj]]);
+              
+              if (dist > farthestDist) {
+                farthestDist = dist;
+              }
+            }
+          }
+
+          if (farthestDist < bestSimilarity) {
+            id1 = i;
+            id2 = j;
+            bestSimilarity = farthestDist;
+          }
+        }
+
+        // Centroid linkage; just compute centroids
+        // of bounding boxes and compare these
+        else if (linkage == Linkage::Centroid) {
+          float dist = similarityFunction(metric,
+                                          clusters[i].bounds.center(),
+                                          clusters[j].bounds.center());
+
+          if (dist < bestSimilarity) {
+            id1 = i;
+            id2 = j;
+            bestSimilarity = dist;
+          }
+        }
+
+        // Average linkage; distance between point averages
+        // determines the cluster distance
+        else if (linkage == Linkage::Average) {
+          vec2f A = input[clusters[i].pointIDs[0]];
+          for (size_t k=1; k<clusters[i].pointIDs.size(); ++k) {
+            A += input[clusters[i].pointIDs[k]];
+          }
+          A /= vec2f(clusters[i].pointIDs.size());
+
+          vec2f B = input[clusters[j].pointIDs[0]];
+          for (size_t k=1; k<clusters[j].pointIDs.size(); ++k) {
+            B += input[clusters[j].pointIDs[k]];
+          }
+          B /= vec2f(clusters[j].pointIDs.size());
+
+          float dist = similarityFunction(metric,A,B);
+
+          if (dist < bestSimilarity) {
+            id1 = i;
+            id2 = j;
+            bestSimilarity = dist;
+          }
+        }
+
       }
     }
 

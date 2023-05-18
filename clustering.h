@@ -27,6 +27,14 @@ enum class SimilarityMetric
   SurfaceArea,
 };
 
+enum class Linkage
+{
+  Single,
+  Complete,
+  Centroid,
+  Average,
+};
+
 struct AggCluster
 {
   std::vector<size_t> pointIDs;
@@ -34,6 +42,7 @@ struct AggCluster
   int level;
 
   // [0,1] centroid in X to draw dendograms from
+  // (don't confuse with cluster centroid!)
   float centroid;
 
   // for convenience, we also store the cluster IDs
@@ -60,6 +69,7 @@ public:
   int currentLevel = 0;
 
   SimilarityMetric metric = SimilarityMetric::EuclideanDistance;
+  Linkage linkage = Linkage::Centroid;
 private:
   std::vector<math::vec2f> input;
   Clusters clusters;
