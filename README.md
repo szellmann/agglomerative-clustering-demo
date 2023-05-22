@@ -21,3 +21,13 @@ CMAKE_PREFIX_PATH=/opt/homebrew/Cellar/qt/6.5.0/lib/cmake/Qt6Widgets cmake <sour
 make
 open agglomerativeClustering.app/
 ```
+
+Code organization
+-----------------
+
+The clustering implementation can be found in [clustering.cpp](/clustering.cpp).
+Definitions for the dendrogram are found in [clustering.h](/clustering.h).
+The `Dendrogram` class stores the sets of clusters generated during (naive)
+construction, allowing us to easily compute cuts, but prohibits scaling to
+serious sizes beyond the toy examples. Besides, the data gets initialized
+in [main.cpp](/main.cpp) in the `main` function.
