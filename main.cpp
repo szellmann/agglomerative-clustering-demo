@@ -68,7 +68,7 @@ inline QColor randomColor(size_t idx)
                           (b&255)/255.f);
 }
 
-std::vector<vec2f> randomPoints(size_t n)
+inline std::vector<vec2f> randomPoints(size_t n)
 {
   std::uniform_real_distribution<float> dist(0,1);
   std::default_random_engine rng;
@@ -83,7 +83,7 @@ std::vector<vec2f> randomPoints(size_t n)
 }
 
 // lifted/adapted from: https://www.naftaliharris.com/blog/visualizing-k-means-clustering/
-std::vector<vec2f> smiley(size_t n)
+inline std::vector<vec2f> smiley(size_t n)
 {
   std::uniform_real_distribution<float> dist(0,1);
   std::default_random_engine rng;
@@ -129,7 +129,7 @@ std::vector<vec2f> smiley(size_t n)
   return data;
 }
 
-std::vector<vec2f> preset1()
+inline std::vector<vec2f> preset1()
 {
   std::vector<vec2f> data(16);
 
