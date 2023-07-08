@@ -182,6 +182,77 @@ std::ostream& operator<<(std::ostream &out, vec3f v) {
   return out;
 }
 
+struct vec4f
+{
+  vec4f() = default;
+  __host__ __device__ vec4f(float s) : x(s), y(s), z(s), w(s) {}
+  __host__ __device__ vec4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+  __host__ __device__ float &operator[](int i) { return ((float*)this)[i]; }
+  __host__ __device__ const float &operator[](int i) const { return ((float*)this)[i]; }
+  float x, y, z, w;
+};
+
+inline __host__ __device__
+vec4f operator+(vec4f v, float a) {
+  return {v.x+a,v.y+a,v.z+a,v.w+a};
+}
+
+inline __host__ __device__
+vec4f operator+(vec4f u, vec4f v) {
+  return {u.x+v.x,u.y+v.y,u.z+v.z,u.w+v.w};
+}
+
+inline __host__ __device__
+vec4f operator-(vec4f u, vec4f v) {
+  return {u.x-v.x,u.y-v.y,u.z-v.z,u.w-v.w};
+}
+
+inline __host__ __device__
+vec4f operator*(vec4f u, vec4f v) {
+  return {u.x*v.x,u.y*v.y,u.z*v.z,u.w*v.w};
+}
+
+inline __host__ __device__
+vec4f operator/(vec4f u, vec4f v) {
+  return {u.x/v.x,u.y/v.y,u.z/v.z,u.w/v.w};
+}
+
+inline __host__ __device__
+vec4f min(vec4f u, vec4f v) {
+  return {fminf(u.x,v.x),fminf(u.y,v.y),fminf(u.z,v.z),fminf(u.w,v.w)};
+}
+
+inline __host__ __device__
+vec4f max(vec4f u, vec4f v) {
+  return {fmaxf(u.x,v.x),fmaxf(u.y,v.y),fmaxf(u.z,v.z),fmaxf(u.w,v.w)};
+}
+
+inline __host__ __device__
+float reduce_min(vec4f u) {
+  return fminf(fminf(fminf(u.x,u.y),u.z),u.w);
+}
+
+inline __host__ __device__
+float reduce_max(vec4f u) {
+  return fmaxf(fmaxf(fmaxf(u.x,u.y),u.z),u.w);
+}
+
+inline __host__ __device__
+float dot(vec4f u, vec4f v) {
+  return u.x*v.x+u.y*v.y+u.z*v.z+u.w*v.w;
+}
+
+inline __host__ __device__
+vec4f normalize(vec4f u) {
+  return u / sqrtf(dot(u,u));
+}
+
+inline
+std::ostream& operator<<(std::ostream &out, vec4f v) {
+  out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';
+  return out;
+}
+
 struct vec2i
 {
   vec2i() = default;
