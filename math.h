@@ -176,6 +176,11 @@ vec3f normalize(vec3f u) {
   return u / sqrtf(dot(u,u));
 }
 
+inline __host__ __device__
+float length(vec3f u) {
+  return sqrtf(dot(u,u));
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec3f v) {
   out << '(' << v.x << ',' << v.y <<',' << v.z << ')';
