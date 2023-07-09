@@ -148,6 +148,30 @@ vec3f operator/(vec3f u, vec3f v) {
 }
 
 inline __host__ __device__
+vec3f& operator+=(vec3f &u, vec3f v) {
+  u=u+v;
+  return u;
+}
+
+inline __host__ __device__
+vec3f& operator-=(vec3f &u, vec3f v) {
+  u=u-v;
+  return u;
+}
+
+inline __host__ __device__
+vec3f& operator*=(vec3f &u, vec3f v) {
+  u=u*v;
+  return u;
+}
+
+inline __host__ __device__
+vec3f& operator/=(vec3f &u, vec3f v) {
+  u=u/v;
+  return u;
+}
+
+inline __host__ __device__
 vec3f min(vec3f u, vec3f v) {
   return {fminf(u.x,v.x),fminf(u.y,v.y),fminf(u.z,v.z)}; }
 
@@ -433,6 +457,11 @@ struct  box3f
   inline __host__ __device__
   vec3f center() const {
     return (lower+upper)/2;
+  }
+
+  inline __host__ __device__
+  vec3f size() const {
+    return upper-lower;
   }
 
   vec3f lower, upper;
