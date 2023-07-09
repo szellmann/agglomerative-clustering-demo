@@ -488,6 +488,11 @@ struct  box3f
   vec3f lower, upper;
 };
 
+inline __host__ __device__
+box3f intersection(const box3f &a, const box3f &b) {
+  return box3f(max(a.lower,b.lower),min(a.upper,b.upper));
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, box3f b) {
   out << '(' << b.lower << ',' << b.upper << ')';
