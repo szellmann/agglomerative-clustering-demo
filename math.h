@@ -186,6 +186,20 @@ float reduce_min(vec3f u) {
 }
 
 inline __host__ __device__
+int arg_min(vec3f u) {
+  return u.x<u.y && u.x<u.z ? 0
+    : u.y<u.x && u.y<u.z ? 1
+    : 2;
+}
+
+inline __host__ __device__
+int arg_max(vec3f u) {
+  return u.x>u.y && u.x>u.z ? 0
+    : u.y>u.x && u.y>u.z ? 1
+    : 2;
+}
+
+inline __host__ __device__
 float reduce_max(vec3f u) {
   return fmaxf(fmaxf(u.x,u.y),u.z);
 }
@@ -462,6 +476,13 @@ struct  box3f
   inline __host__ __device__
   vec3f size() const {
     return upper-lower;
+  }
+
+  inline __host__ __device__
+  bool contains(vec3f p) const {
+    return lower.x<=p.x && p.x<=upper.x
+        && lower.y<=p.y && p.y<=upper.y
+        && lower.z<=p.z && p.z<=upper.z;
   }
 
   vec3f lower, upper;
