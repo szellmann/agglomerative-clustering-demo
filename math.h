@@ -210,6 +210,15 @@ float dot(vec3f u, vec3f v) {
 }
 
 inline __host__ __device__
+vec3f cross(vec3f u, vec3f v) {
+  return {
+    u.y*v.z-u.z*v.y,
+    u.z*v.x-u.x*v.z,
+    u.x*v.y-u.y*v.x
+  };
+}
+
+inline __host__ __device__
 vec3f normalize(vec3f u) {
   return u / sqrtf(dot(u,u));
 }
