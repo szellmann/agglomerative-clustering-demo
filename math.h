@@ -372,16 +372,60 @@ vec2ui operator-(vec2ui u, vec2ui v) {
   return {u.x-v.x,u.y-v.y};
 }
 
+inline __host__ __device__
+bool operator==(vec2ui u, vec2ui v)
+{
+  return u.x==v.x && u.y==v.y;
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec2ui v) {
   out << '(' << v.x << ',' << v.y << ')';
   return out;
 }
 
-inline
-bool operator==(vec2ui u, vec2ui v)
+struct mat3f
 {
-  return u.x==v.x && u.y==v.y;
+  mat3f() = default;
+  __host__ __device__ mat3f(vec3f c0, vec3f c1, vec3f c2) : col0(c0), col1(c1), col2(c2) {}
+  __host__ __device__
+  mat3f(float m00, float m10, float m20,
+        float m01, float m11, float m21,
+        float m02, float m12, float m22)
+    : col0(m00,m10,m20), col1(m01,m11,m21), col2(m02,m12,m22)
+  {}
+
+  __host__ __device__ vec3f &operator()(int col) { return *((vec3f *)this + col); }
+  __host__ __device__ const vec3f &operator()(int col) const { return *((vec3f *)this + col); }
+  __host__ __device__ float &operator()(int row, int col) { return (operator()(col))[row]; }
+  __host__ __device__ const float &operator()(int row, int col) const { return (operator()(col))[row]; }
+
+  vec3f col0, col1, col2;
+};
+
+inline
+mat3f inverse(const mat3f &m) {
+  auto det2 = [](float m00, float m01, float m10, float m11) {
+    return m00*m11 - m10*m01;
+  };
+
+  float a00 = det2(m(1,1), m(1,2), m(2,1), m(2,2));
+  float a01 = det2(m(1,0), m(1,2), m(2,0), m(2,2));
+  float a02 = det2(m(1,0), m(1,1), m(2,0), m(2,1));
+  float a10 = det2(m(0,1), m(0,2), m(2,1), m(2,2));
+  float a11 = det2(m(0,0), m(0,2), m(2,0), m(2,2));
+  float a12 = det2(m(0,0), m(0,1), m(2,0), m(2,1));
+  float a20 = det2(m(0,1), m(0,2), m(1,1), m(1,2));
+  float a21 = det2(m(0,0), m(0,2), m(1,0), m(1,2));
+  float a22 = det2(m(0,0), m(0,1), m(1,0), m(1,1));
+
+  float det = m(0,0)*a00 - m(0,1)*a01 + m(0,2)*a02;
+
+  return mat3f(
+     a00/det, -a01/det,  a02/det,
+    -a10/det,  a11/det, -a12/det,
+     a20/det, -a21/det,  a22/det
+  );
 }
 
 struct box1f
