@@ -403,7 +403,7 @@ struct mat3f
   vec3f col0, col1, col2;
 };
 
-inline
+inline __host__ __device__
 mat3f inverse(const mat3f &m) {
   auto det2 = [](float m00, float m01, float m10, float m11) {
     return m00*m11 - m10*m01;
@@ -426,6 +426,12 @@ mat3f inverse(const mat3f &m) {
     -a10/det,  a11/det, -a12/det,
      a20/det, -a21/det,  a22/det
   );
+}
+
+inline
+std::ostream& operator<<(std::ostream &out, const mat3f &m) {
+  out << '(' << m.col0 << ',' << m.col1 << ',' << m.col2 << ')';
+  return out;
 }
 
 struct box1f
