@@ -239,6 +239,7 @@ struct vec4f
   vec4f() = default;
   __host__ __device__ vec4f(float s) : x(s), y(s), z(s), w(s) {}
   __host__ __device__ vec4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+  __host__ __device__ vec4f(vec3f v, float w) : x(v.x), y(v.y), z(v.z), w(w) {}
   __host__ __device__ float &operator[](int i) { return ((float*)this)[i]; }
   __host__ __device__ const float &operator[](int i) const { return ((float*)this)[i]; }
   float x, y, z, w;
@@ -431,6 +432,57 @@ mat3f inverse(const mat3f &m) {
 inline
 std::ostream& operator<<(std::ostream &out, const mat3f &m) {
   out << '(' << m.col0 << ',' << m.col1 << ',' << m.col2 << ')';
+  return out;
+}
+
+struct mat4f
+{
+  mat4f() = default;
+  __host__ __device__ mat4f(vec4f c0, vec4f c1, vec4f c2, vec4f c3) : col0(c0), col1(c1), col2(c2), col3(c3) {}
+  __host__ __device__
+  mat4f(float m00, float m10, float m20, float m30,
+        float m01, float m11, float m21, float m31,
+        float m02, float m12, float m22, float m32,
+        float m03, float m13, float m23, float m33)
+    : col0(m00,m10,m20,m30), col1(m01,m11,m21,m31), col2(m02,m12,m22,m32), col3(m03,m13,m23,m33)
+  {}
+
+  __host__ __device__ vec4f &operator()(int col) { return *((vec4f *)this + col); }
+  __host__ __device__ const vec4f &operator()(int col) const { return *((vec4f *)this + col); }
+  __host__ __device__ float &operator()(int row, int col) { return (operator()(col))[row]; }
+  __host__ __device__ const float &operator()(int row, int col) const { return (operator()(col))[row]; }
+
+  vec4f col0, col1, col2, col3;
+};
+
+inline __host__ __device__
+mat4f make_frustum(float left, float right, float bottom, float top, float znear, float zfar) {
+  mat4f M;
+  M(0,0) = (2*znear)/(right-left);
+  M(0,1) = 0;
+  M(0,2) = (right+left)/(right-left);
+  M(0,3) = 0;
+
+  M(1,0) = 0;
+  M(1,1) = (2*znear)/(top-bottom);
+  M(1,2) = (top+bottom)/(top-bottom);
+  M(1,3) = 0;
+
+  M(2,0) = 0;
+  M(2,1) = 0;
+  M(2,2) = -(zfar+znear)/(zfar-znear);
+  M(2,3) = -(2*zfar*znear)/(zfar-znear);
+
+  M(3,0) = 0;
+  M(3,1) = 0;
+  M(3,2) = -1;
+  M(3,3) = 0;
+  return M;
+}
+
+inline
+std::ostream& operator<<(std::ostream &out, const mat4f &m) {
+  out << '(' << m.col0 << ',' << m.col1 << ',' << m.col2 << ',' << m.col3 << ')';
   return out;
 }
 
