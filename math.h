@@ -513,6 +513,31 @@ mat4f make_frustum(float left, float right, float bottom, float top, float znear
   return M;
 }
 
+inline __host__ __device__
+mat4f make_ortho(float left, float right, float bottom, float top, float znear, float zfar) {
+  mat4f M;
+  M(0,0) = 2/(right-left);
+  M(0,1) = 0;
+  M(0,2) = 0;
+  M(0,3) = -(right+left)/(right-left);
+
+  M(1,0) = 0;
+  M(1,1) = 2/(top-bottom);
+  M(1,2) = 0;
+  M(1,3) = -(top+bottom)/(top-bottom);
+
+  M(2,0) = 0;
+  M(2,1) = 0;
+  M(2,2) = -2/(zfar-znear);
+  M(2,3) = -(zfar+znear)/(zfar-znear);
+
+  M(3,0) = 0;
+  M(3,1) = 0;
+  M(3,2) = 0;
+  M(3,3) = 1;
+  return M;
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, const mat4f &m) {
   out << '(' << m.col0 << ',' << m.col1 << ',' << m.col2 << ',' << m.col3 << ')';
