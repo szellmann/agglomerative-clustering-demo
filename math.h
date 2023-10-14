@@ -452,6 +452,18 @@ struct mat4f
   __host__ __device__ float &operator()(int row, int col) { return (operator()(col))[row]; }
   __host__ __device__ const float &operator()(int row, int col) const { return (operator()(col))[row]; }
 
+  __host__ __device__ float *data() { return (float *)this; }
+  __host__ __device__ const float *data() const { return (float *)this; }
+
+  __host__ __device__
+  static mat4f identity() {
+    return mat4f(
+      1.f,0.f,0.f,0.f,
+      0.f,1.f,0.f,0.f,
+      0.f,0.f,1.f,0.f,
+      0.f,0.f,0.f,1.f);
+  }
+
   vec4f col0, col1, col2, col3;
 };
 
