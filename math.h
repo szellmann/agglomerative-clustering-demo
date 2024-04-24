@@ -352,6 +352,26 @@ struct vec3i
   int x, y, z;
 };
 
+inline __host__ __device__
+vec3i operator+(vec3i u, vec3i v) {
+  return {u.x+v.x,u.y+v.y,u.z+v.z};
+}
+
+inline __host__ __device__
+vec3i operator-(vec3i u, vec3i v) {
+  return {u.x-v.x,u.y-v.y,u.z-v.z};
+}
+
+inline __host__ __device__
+vec3i operator*(vec3i u, vec3i v) {
+  return {u.x*v.x,u.y*v.y,u.z*v.z};
+}
+
+inline __host__ __device__
+vec3i operator/(vec3i u, vec3i v) {
+  return {u.x/v.x,u.y/v.y,u.z/v.z};
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec3i v) {
   out << '(' << v.x << ',' << v.y <<',' << v.z << ')';
