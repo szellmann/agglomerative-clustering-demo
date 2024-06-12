@@ -580,6 +580,11 @@ struct box1f
   }
 
   inline __host__ __device__
+  float size() const {
+    return upper-lower;
+  }
+
+  inline __host__ __device__
   void extend(float v) {
     lower = fminf(lower,v);
     upper = fmaxf(upper,v);
