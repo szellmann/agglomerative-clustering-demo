@@ -881,6 +881,12 @@ struct vectorN
   const value_type &operator[](size_t i) const;
 
   inline
+  const T *begin() const;
+
+  inline
+  const T *end() const;
+
+  inline
   sliceT<vectorN> slice(size_t lower, size_t upper);
 
   inline
@@ -937,6 +943,16 @@ template <typename T, typename Allocator>
 const typename vectorN<T,Allocator>::value_type &vectorN<T,Allocator>::operator[](size_t i) const {
   assert(i<N);
   return data[i];
+}
+
+template <typename T, typename Allocator>
+const T *vectorN<T,Allocator>::begin() const {
+  return data;
+}
+
+template <typename T, typename Allocator>
+const T *vectorN<T,Allocator>::end() const {
+  return data+N;
 }
 
 template <typename T, typename Allocator>
