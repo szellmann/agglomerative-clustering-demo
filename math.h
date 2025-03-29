@@ -378,6 +378,41 @@ std::ostream& operator<<(std::ostream &out, vec3i v) {
   return out;
 }
 
+struct vec4i
+{
+  vec4i() = default;
+  __host__ __device__ vec4i(int s) : x(s), y(s), z(s), w(s) {}
+  __host__ __device__ vec4i(int x, int y, int z, int w) : x(x), y(y), z(z), w(w) {}
+  __host__ __device__ int &operator[](int i) { return ((int*)this)[i]; }
+  __host__ __device__ const int &operator[](int i) const { return ((int*)this)[i]; }
+  int x, y, z, w;
+};
+
+inline __host__ __device__
+vec4i operator+(vec4i u, vec4i v) {
+  return {u.x+v.x,u.y+v.y,u.z+v.z,u.w+v.w};
+}
+
+inline __host__ __device__
+vec4i operator-(vec4i u, vec4i v) {
+  return {u.x-v.x,u.y-v.y,u.z-v.z,u.z-v.z};
+}
+
+inline __host__ __device__
+vec4i operator*(vec4i u, vec4i v) {
+  return {u.x*v.x,u.y*v.y,u.z*v.z,u.z*v.z};
+}
+
+inline __host__ __device__
+vec4i operator/(vec4i u, vec4i v) {
+  return {u.x/v.x,u.y/v.y,u.z/v.z,u.z/v.z};
+}
+
+inline
+std::ostream& operator<<(std::ostream &out, vec4i v) {
+  out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';
+  return out;
+}
 struct vec2ui
 {
   vec2ui() = default;
