@@ -106,6 +106,16 @@ float length(vec2f u) {
   return sqrtf(dot(u,u));
 }
 
+inline __host__ __device__
+bool operator==(vec2f u, vec2f v) {
+  return u.x==v.x && u.y==v.y;
+}
+
+inline __host__ __device__
+bool operator!=(vec2f u, vec2f v) {
+  return !(u==v);
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec2f v) {
   out << '(' << v.x << ',' << v.y << ')';
@@ -228,6 +238,16 @@ float length(vec3f u) {
   return sqrtf(dot(u,u));
 }
 
+inline __host__ __device__
+bool operator==(vec3f u, vec3f v) {
+  return u.x==v.x && u.y==v.y && u.z==v.z;
+}
+
+inline __host__ __device__
+bool operator!=(vec3f u, vec3f v) {
+  return !(u==v);
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec3f v) {
   out << '(' << v.x << ',' << v.y <<',' << v.z << ')';
@@ -300,6 +320,16 @@ vec4f normalize(vec4f u) {
   return u / sqrtf(dot(u,u));
 }
 
+inline __host__ __device__
+bool operator==(vec4f u, vec4f v) {
+  return u.x==v.x && u.y==v.y && u.z==v.z && u.w==v.w;
+}
+
+inline __host__ __device__
+bool operator!=(vec4f u, vec4f v) {
+  return !(u==v);
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec4f v) {
   out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';
@@ -334,6 +364,16 @@ vec2i operator*(vec2i u, vec2i v) {
 inline __host__ __device__
 vec2i operator/(vec2i u, vec2i v) {
   return {u.x/v.x,u.y/v.y};
+}
+
+inline __host__ __device__
+bool operator==(vec2i u, vec2i v) {
+  return u.x==v.x && u.y==v.y;
+}
+
+inline __host__ __device__
+bool operator!=(vec2i u, vec2i v) {
+  return !(u==v);
 }
 
 inline
@@ -372,6 +412,16 @@ vec3i operator/(vec3i u, vec3i v) {
   return {u.x/v.x,u.y/v.y,u.z/v.z};
 }
 
+inline __host__ __device__
+bool operator==(vec3i u, vec3i v) {
+  return u.x==v.x && u.y==v.y && u.z==v.z;
+}
+
+inline __host__ __device__
+bool operator!=(vec3i u, vec3i v) {
+  return !(u==v);
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec3i v) {
   out << '(' << v.x << ',' << v.y <<',' << v.z << ')';
@@ -408,6 +458,16 @@ vec4i operator/(vec4i u, vec4i v) {
   return {u.x/v.x,u.y/v.y,u.z/v.z,u.z/v.z};
 }
 
+inline __host__ __device__
+bool operator==(vec4i u, vec4i v) {
+  return u.x==v.x && u.y==v.y && u.z==v.z && u.w==v.w;
+}
+
+inline __host__ __device__
+bool operator!=(vec4i u, vec4i v) {
+  return !(u==v);
+}
+
 inline
 std::ostream& operator<<(std::ostream &out, vec4i v) {
   out << '(' << v.x << ',' << v.y << ',' << v.z << ',' << v.w << ')';
@@ -429,9 +489,13 @@ vec2ui operator-(vec2ui u, vec2ui v) {
 }
 
 inline __host__ __device__
-bool operator==(vec2ui u, vec2ui v)
-{
+bool operator==(vec2ui u, vec2ui v) {
   return u.x==v.x && u.y==v.y;
+}
+
+inline __host__ __device__
+bool operator!=(vec2ui u, vec2ui v) {
+  return !(u==v);
 }
 
 inline
