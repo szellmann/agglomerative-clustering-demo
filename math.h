@@ -367,6 +367,12 @@ vec2i operator/(vec2i u, vec2i v) {
 }
 
 inline __host__ __device__
+vec2i& operator+=(vec2i &u, vec2i v) {
+  u=u+v;
+  return u;
+}
+
+inline __host__ __device__
 bool operator==(vec2i u, vec2i v) {
   return u.x==v.x && u.y==v.y;
 }
