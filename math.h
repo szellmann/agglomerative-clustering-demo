@@ -811,6 +811,16 @@ struct box3i
   }
 
   inline __host__ __device__
+  vec3i center() const {
+    return (lower+upper)/2;
+  }
+
+  inline __host__ __device__
+  vec3i size() const {
+    return upper-lower;
+  }
+
+  inline __host__ __device__
   bool contains(vec3i p) const {
     return lower.x<=p.x && p.x<=upper.x
         && lower.y<=p.y && p.y<=upper.y
