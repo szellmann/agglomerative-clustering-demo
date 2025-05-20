@@ -801,7 +801,7 @@ std::ostream& operator<<(std::ostream &out, box3f b) {
 struct box3i
 {
   box3i() = default;
-  box3i(vec3i lo, vec3i up) : lower(lo), upper(up) {}
+  __host__ __device__ box3i(vec3i lo, vec3i up) : lower(lo), upper(up) {}
 
   inline __host__ __device__
   bool empty() const {
