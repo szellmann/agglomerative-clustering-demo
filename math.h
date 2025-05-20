@@ -419,6 +419,30 @@ vec3i operator/(vec3i u, vec3i v) {
 }
 
 inline __host__ __device__
+vec3i& operator+=(vec3i &u, vec3i v) {
+  u=u+v;
+  return u;
+}
+
+inline __host__ __device__
+vec3i& operator-=(vec3i &u, vec3i v) {
+  u=u-v;
+  return u;
+}
+
+inline __host__ __device__
+vec3i& operator*=(vec3i &u, vec3i v) {
+  u=u*v;
+  return u;
+}
+
+inline __host__ __device__
+vec3i& operator/=(vec3i &u, vec3i v) {
+  u=u/v;
+  return u;
+}
+
+inline __host__ __device__
 bool operator==(vec3i u, vec3i v) {
   return u.x==v.x && u.y==v.y && u.z==v.z;
 }
