@@ -864,6 +864,164 @@ std::ostream& operator<<(std::ostream &out, box3i b) {
   return out;
 }
 
+//=========================================================
+// 1D interval
+//=========================================================
+
+struct interval1f
+{
+  interval1f() = default;
+  __host__ __device__ interval1f(float f) : lo(f), hi(f) {}
+  __host__ __device__ interval1f(float l, float h) : lo(l), hi(h) {}
+  __host__ __device__ float length() const { return hi-lo; }
+  __host__ __device__ bool contains(float f) const { return lo <= f && f <= hi; }
+  float lo, hi;
+};
+
+inline __host__ __device__
+interval1f operator+(interval1f a, interval1f b) {
+  return {a.lo+b.lo,a.hi+b.hi};
+}
+
+inline __host__ __device__
+interval1f operator-(interval1f a, interval1f b) {
+  return {a.lo-b.lo,a.hi-b.hi};
+}
+
+inline __host__ __device__
+interval1f operator*(interval1f a, interval1f b) {
+  float ac = a.lo*b.lo;
+  float ad = a.lo*b.hi;
+  float bc = a.hi*b.lo;
+  float bd = a.hi*b.hi;
+  return {
+    fminf(ac,fminf(ad,fminf(bc,bd))),
+    fmaxf(ac,fmaxf(ad,fmaxf(bc,bd)))
+  };
+}
+
+inline __host__ __device__
+interval1f operator/(interval1f a, interval1f b) {
+  // special handling for "division by zero" (eqvl. 0 in b)
+  if (b.lo <= 0.f && 0.f <= b.hi) {
+    return {-INFINITY, INFINITY};
+  }
+
+  float ac = a.lo/b.lo;
+  float ad = a.lo/b.hi;
+  float bc = a.hi/b.lo;
+  float bd = a.hi/b.hi;
+  return {
+    fminf(ac,fminf(ad,fminf(bc,bd))),
+    fmaxf(ac,fmaxf(ad,fmaxf(bc,bd)))
+  };
+}
+
+inline __host__ __device__
+interval1f& operator+=(interval1f& a, const interval1f& b) {
+  a = a+b;
+  return a;
+}
+
+inline __host__ __device__
+interval1f& operator-=(interval1f& a, const interval1f& b) {
+  a = a-b;
+  return a;
+}
+
+inline __host__ __device__
+interval1f& operator*=(interval1f& a, const interval1f& b) {
+  a = a*b;
+  return a;
+}
+
+inline __host__ __device__
+interval1f& operator/=(interval1f& a, const interval1f& b) {
+  a = a/b;
+  return a;
+}
+
+inline
+std::ostream& operator<<(std::ostream& out, interval1f ival) {
+  out << '[' << ival.lo << ':' << ival.hi << ']';
+  return out;
+}
+
+//=========================================================
+// 3D interval
+//=========================================================
+
+struct interval3f
+{
+  interval3f() = default;
+  __host__ __device__ interval3f(interval1f i) : x(i), y(i), z(i) {}
+  __host__ __device__ interval3f(interval1f x, interval1f y, interval1f z)
+    : x(x), y(y), z(z)
+  {}
+  __host__ __device__ interval3f(vec3f f) : x(f.x), y(f.y), z(f.z) {}
+  __host__ __device__ interval3f(vec3f lo, vec3f hi)
+    : x(lo.x,hi.x), y(lo.y,hi.y), z(lo.z,hi.z)
+  {}
+  __host__ __device__ float volume() const { return x.length()*y.length()*z.length(); }
+  __host__ __device__ bool contains(vec3f f) const {
+    return x.contains(f.x) && y.contains(f.y) && z.contains(f.z);
+  }
+  __host__ __device__ const interval1f &operator[](int i) const {
+    return i==0 ? x : i==1 ? y : z;
+  }
+  __host__ __device__ interval1f &operator[](int i) {
+    return i==0 ? x : i==1 ? y : z;
+  }
+  interval1f x, y, z;
+};
+
+inline __host__ __device__
+interval3f operator+(const interval3f& a, const interval3f& b) {
+  return {a.x+b.x,a.y+b.y,a.z+b.z};
+}
+
+inline __host__ __device__
+interval3f operator*(const interval3f& a, const interval3f& b) {
+  return {a.x*b.x,a.y*b.y,a.z*b.z};
+}
+
+inline __host__ __device__
+interval3f& operator+=(interval3f& a, const interval3f& b) {
+  a=a+b;
+  return a;
+}
+
+// inline __host__ __device__
+// interval3f& operator-=(interval3f& a, const interval3f& b) {
+//   a=a-b;
+//   return a;
+// }
+
+inline __host__ __device__
+interval3f& operator*=(interval3f& a, const interval3f& b) {
+  a=a*b;
+  return a;
+}
+
+// inline __host__ __device__
+// interval3f& operator/=(interval3f& a, const interval3f& b) {
+//   a=a/b;
+//   return a;
+// }
+
+inline
+std::ostream& operator<<(std::ostream& out, interval3f ival) {
+  out << '[' << vec3f(ival.x.lo,ival.y.lo,ival.z.lo) << ':'
+    << vec3f(ival.x.hi,ival.y.hi,ival.z.hi) << ']';
+  return out;
+}
+
+// promoting operations
+
+inline __host__ __device__
+interval3f operator*(const vec3f& a, const interval1f& b) {
+  return {interval1f(a.x)*b,interval1f(a.y)*b,interval1f(a.z)*b};
+}
 
 // ==================================================================
 // misc
