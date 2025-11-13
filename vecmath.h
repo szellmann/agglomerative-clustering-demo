@@ -34,7 +34,10 @@ struct vec2f
   __host__ __device__ vec2f(float x, float y) : x(x), y(y) {}
   __host__ __device__ float &operator[](int i) { return ((float*)this)[i]; }
   __host__ __device__ const float &operator[](int i) const { return ((float*)this)[i]; }
-  float x, y;
+  union {
+    struct { float x, y; };
+    struct { float u, v; };
+  };
 };
 
 inline __host__ __device__
@@ -129,7 +132,10 @@ struct vec3f
   __host__ __device__ vec3f(float x, float y, float z) : x(x), y(y), z(z) {}
   __host__ __device__ float &operator[](int i) { return ((float*)this)[i]; }
   __host__ __device__ const float &operator[](int i) const { return ((float*)this)[i]; }
-  float x, y, z;
+  union {
+    struct { float x, y, z; };
+    struct { float u, v, w; };
+  };
 };
 
 inline __host__ __device__
