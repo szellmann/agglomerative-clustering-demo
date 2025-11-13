@@ -32,9 +32,9 @@
 #include <QGroupBox>
 #include <QMouseEvent>
 #include "clustering.h"
-#include "math.h"
+#include "vecmath.h"
 
-using namespace math;
+using namespace vecmath;
 
 int g_initialDist = 2;
 bool g_showClusters = true;

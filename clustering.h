@@ -17,7 +17,7 @@
 #pragma once
 
 #include <vector>
-#include "math.h"
+#include "vecmath.h"
 
 enum class SimilarityMetric
 {
@@ -38,7 +38,7 @@ enum class Linkage
 struct AggCluster
 {
   std::vector<size_t> pointIDs;
-  math::box2f bounds;
+  vecmath::box2f bounds;
   int level;
 
   // [0,1] centroid in X to draw dendograms from
@@ -50,16 +50,16 @@ struct AggCluster
   int id1, id2;
 };
 
-typedef std::vector<math::vec2f> Points;
+typedef std::vector<vecmath::vec2f> Points;
 typedef std::vector<AggCluster> Clusters;
-typedef std::vector<math::box1f> Ranges;
+typedef std::vector<vecmath::box1f> Ranges;
 
 class Dendrogram
 {
 public:
   Dendrogram() = default;
-  Dendrogram(const std::vector<math::vec2f> &points);
-  void reset(const std::vector<math::vec2f> &points);
+  Dendrogram(const std::vector<vecmath::vec2f> &points);
+  void reset(const std::vector<vecmath::vec2f> &points);
   bool step();
 
   Points getPoints() const;
@@ -71,7 +71,7 @@ public:
   SimilarityMetric metric = SimilarityMetric::EuclideanDistance;
   Linkage linkage = Linkage::Centroid;
 private:
-  std::vector<math::vec2f> input;
+  std::vector<vecmath::vec2f> input;
   Clusters clusters;
   Ranges hranges;
   std::vector<Clusters> levels;

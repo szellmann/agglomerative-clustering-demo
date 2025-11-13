@@ -19,7 +19,7 @@
 #include <cassert>
 #include <cfloat>
 #include "clustering.h"
-using namespace math;
+using namespace vecmath;
 
 Dendrogram::Dendrogram(const std::vector<vec2f> &points)
 {

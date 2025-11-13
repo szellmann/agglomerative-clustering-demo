@@ -26,7 +26,7 @@
 #define __device__
 #endif
 
-namespace math {
+namespace vecmath {
 struct vec2f
 {
   vec2f() = default;
@@ -1624,6 +1624,6 @@ bool boxTest(const Ray &ray, const box3f &box, float &t0, float &t1) {
   return t0 < t1;
 }
 
-} // namespace math
+} // namespace vecmath
 
 
