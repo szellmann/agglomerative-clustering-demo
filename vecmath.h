@@ -1611,13 +1611,18 @@ std::ostream &operator<<(std::ostream &out, const matrixN<T,Allocator> &m) {
 
 struct Ray
 {
+  Ray() = default;
+  __host__ __device__
+  Ray(const vec3f o, const vec3f d, float mi, float ma)
+    : org(o), tmin(mi), dir(d), tmax(ma) {}
+
   vec3f org;
   float tmin;
   vec3f dir;
   float tmax;
 };
 
-inline
+inline __host__ __device__
 bool boxTest(const Ray &ray, const box3f &box, float &t0, float &t1) {
   const vec3f t_lo = (box.lower - ray.org) / ray.dir;
   const vec3f t_hi = (box.upper - ray.org) / ray.dir;
