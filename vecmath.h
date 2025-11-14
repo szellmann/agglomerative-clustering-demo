@@ -340,6 +340,11 @@ struct vec3f
 };
 
 inline __host__ __device__
+vec3f operator-(vec3f v) {
+  return {-v.x,-v.y,-v.z};
+}
+
+inline __host__ __device__
 vec3f operator+(vec3f v, float a) {
   return {v.x+a,v.y+a,v.z+a};
 }
