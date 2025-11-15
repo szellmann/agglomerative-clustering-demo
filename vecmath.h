@@ -110,6 +110,26 @@ vec3i operator/(vec3i u, vec3i v) {
 }
 
 inline __host__ __device__
+vec3i operator+(vec3i v, int a) {
+  return {v.x+a,v.y+a,v.z+a};
+}
+
+inline __host__ __device__
+vec3i operator-(vec3i v, int a) {
+  return {v.x-a,v.y-a,v.z-a};
+}
+
+inline __host__ __device__
+vec3i operator*(vec3i v, int a) {
+  return {v.x*a,v.y*a,v.z*a};
+}
+
+inline __host__ __device__
+vec3i operator/(vec3i v, int a) {
+  return {v.x/a,v.y/a,v.z/a};
+}
+
+inline __host__ __device__
 vec3i& operator+=(vec3i &u, vec3i v) {
   u=u+v;
   return u;
@@ -345,11 +365,6 @@ vec3f operator-(vec3f v) {
 }
 
 inline __host__ __device__
-vec3f operator+(vec3f v, float a) {
-  return {v.x+a,v.y+a,v.z+a};
-}
-
-inline __host__ __device__
 vec3f operator+(vec3f u, vec3f v) {
   return {u.x+v.x,u.y+v.y,u.z+v.z};
 }
@@ -367,6 +382,26 @@ vec3f operator*(vec3f u, vec3f v) {
 inline __host__ __device__
 vec3f operator/(vec3f u, vec3f v) {
   return {u.x/v.x,u.y/v.y,u.z/v.z};
+}
+
+inline __host__ __device__
+vec3f operator+(vec3f v, float a) {
+  return {v.x+a,v.y+a,v.z+a};
+}
+
+inline __host__ __device__
+vec3f operator-(vec3f v, float a) {
+  return {v.x-a,v.y-a,v.z-a};
+}
+
+inline __host__ __device__
+vec3f operator*(vec3f v, float a) {
+  return {v.x*a,v.y*a,v.z*a};
+}
+
+inline __host__ __device__
+vec3f operator/(vec3f v, float a) {
+  return {v.x/a,v.y/a,v.z/a};
 }
 
 inline __host__ __device__
