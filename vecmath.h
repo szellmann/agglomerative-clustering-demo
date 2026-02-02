@@ -1,5 +1,5 @@
 // ======================================================================== //
-// Copyright 2022-2025 Stefan Zellmann                                      //
+// Copyright 2022-2026 Stefan Zellmann                                      //
 //                                                                          //
 // Licensed under the Apache License, Version 2.0 (the "License");          //
 // you may not use this file except in compliance with the License.         //
@@ -38,6 +38,20 @@ struct vec4i;
 struct vec2f;
 struct vec3f;
 struct vec4f;
+
+// ==================================================================
+// general
+// ==================================================================
+
+inline
+__host__ __device__ int iDivUp(int a, int b) {
+  return (a+b-1)/b;
+}
+
+
+// ==================================================================
+// vec types
+// ==================================================================
 
 struct vec2i
 {
