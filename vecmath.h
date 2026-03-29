@@ -998,6 +998,16 @@ struct box1f
   }
 
   inline __host__ __device__
+  bool overlaps(const box1f &other) {
+    return !intersection(other).empty();
+  }
+
+  inline __host__ __device__
+  box1f intersection(const box1f &other) {
+    return {fmaxf(lower,other.lower),fminf(upper,other.upper)};
+  }
+
+  inline __host__ __device__
   void extend(float v) {
     lower = fminf(lower,v);
     upper = fmaxf(upper,v);
@@ -1036,6 +1046,16 @@ struct box2f
   bool contains(vec2f p) const {
     return lower.x<=p.x && p.x<=upper.x
         && lower.y<=p.y && p.y<=upper.y;
+  }
+
+  inline __host__ __device__
+  bool overlaps(const box2f &other) {
+    return !intersection(other).empty();
+  }
+
+  inline __host__ __device__
+  box2f intersection(const box2f &other) {
+    return {max(lower,other.lower),min(upper,other.upper)};
   }
 
   inline __host__ __device__
@@ -1090,6 +1110,16 @@ struct  box3f
     return lower.x<=p.x && p.x<=upper.x
         && lower.y<=p.y && p.y<=upper.y
         && lower.z<=p.z && p.z<=upper.z;
+  }
+
+  inline __host__ __device__
+  bool overlaps(const box3f &other) {
+    return !intersection(other).empty();
+  }
+
+  inline __host__ __device__
+  box3f intersection(const box3f &other) {
+    return {max(lower,other.lower),min(upper,other.upper)};
   }
 
   inline __host__ __device__
@@ -1693,6 +1723,16 @@ size_t arg_max(const vectorN<T,Allocator> &u) {
 }
 
 template <typename T, typename Allocator>
+T reduce_min(const vectorN<T,Allocator> &u) {
+  return u[arg_min(u)];
+}
+
+template <typename T, typename Allocator>
+T reduce_max(const vectorN<T,Allocator> &u) {
+  return u[arg_max(u)];
+}
+
+template <typename T, typename Allocator>
 vectorN<T,Allocator> clamp(const vectorN<T,Allocator> &u, const T &a, const T &b) {
   vectorN<T,Allocator> result(u.size());
   for (size_t i=0; i<u.size(); ++i) {
@@ -1724,12 +1764,15 @@ struct matrixN
 {
   typedef T value_type;
 
-  matrixN() = default;
+  matrixN();
   matrixN(unsigned numRows, unsigned numCols);
   matrixN(const matrixN &other);
   matrixN &operator=(const matrixN &other);
  ~matrixN();
-  unsigned numRows=0, numCols=0;
+  union {
+    struct { unsigned numRows, numCols; };
+    struct { unsigned fanIn, fanOut; };
+  };
   T *data=nullptr;
   Allocator alloc;
   static_assert(std::is_same<T,typename Allocator::value_type>::value,"Type mismatch");
@@ -1755,6 +1798,11 @@ struct matrixN
   inline
   blockT<const matrixN> block(vec2ui lower, vec2ui upper) const;
 };
+
+template <typename T, typename Allocator>
+matrixN<T,Allocator>::matrixN()
+  : numRows(0), numCols(0)
+{}
 
 template <typename T, typename Allocator>
 matrixN<T,Allocator>::matrixN(unsigned numRows, unsigned numCols)
